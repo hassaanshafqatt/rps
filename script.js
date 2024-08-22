@@ -1,23 +1,27 @@
 var humanScore = 0,
   compScore = 0,
   ties = 0;
-var rounds = 5;
+var rounds = 0;
 
-function play() {
-  for (let i = 0; i < rounds; i++) {
-    start();
-    alert("Player: " + humanScore + "\nComputer: " + compScore+ "\nDraws: "+ ties);
-  }
+function play(selection) {
+  start(selection);
+  // update scores here
+  updateScores();
+  // until the round ends
   let winner = checkScores();
-  alert(winner);
+  updateState(winner);
+  rounds++;
+  if (rounds == 5) {
+    gameEnd();
+  }
 }
 
-function start() {
+function start(selection) {
   let cc = getComputerChoice();
-  let hc = getHumanChoice();
+  let hc = selection;
 
   let control = check(hc, cc);
-  console.log("control: "+control)
+  console.log("control: " + control);
   if (control == 0) {
     compScore++;
   } else if (!control) {
@@ -29,45 +33,38 @@ function start() {
 
 function checkScores() {
   if (humanScore > compScore) {
-    return "Player wins";
+    return "Player is winnning";
   } else if (humanScore == compScore) {
-    return "Draw";
+    return "Scores have tied";
   } else {
-    return "Computer Wins";
+    return "Computer is winning";
   }
 }
 
 function check(hc, cc) {
-  let control = null;
-  if (hc == cc) {
-    control = null;
-  } else if (cc == 1 && hc == 2) {
-    control = 1;
-  } else if (cc == 1 && hc == 3) {
-    control = 0;
-  } else if (cc == 2 && hc == 1) {
-    control = 0;
-  } else if (cc == 2 && hc == 3) {
-    control = 1;
-  } else if (cc == 3 && hc == 1) {
-    control = 1;
-  } else if (cc == 3 && hc == 2) {
-    control = 0;
-  }
+  const control = {
+    1: { 1: null, 2: 1, 3: 0 },
+    2: { 1: 0, 2: null, 3: 1 },
+    3: { 1: 1, 2: 0, 3: null },
+  };
 
-  return control;
+  return control[cc]?.[hc] ?? null;
 }
 
 function getComputerChoice() {
-  let rand = Math.floor(Math.random() * 3)+1;
-  console.log(rand)
+  let rand = Math.floor(Math.random() * 3) + 1;
+  console.log(rand);
   return rand;
 }
 
-function getHumanChoice() {
-  let choice = parseInt(prompt("1. Rock \n2. Paper \n3. Scissors"));
-  if (!(choice >= 1 && choice <= 3)) {
-    choice = getHumanChoice();
+
+const gameEnd = () => {
+  if (humanScore > compScore) {
+    updateState("Player Wins");
+  } else if (humanScore == compScore) {
+    updateState("Drawn");
+  } else {
+    updateState("Computer Wins");
   }
-  return choice;
+  disableState();
 }
